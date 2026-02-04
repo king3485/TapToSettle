@@ -3,9 +3,7 @@ import crypto from "crypto";
 
 
 
-function makeShareToken() {
-    return crypto.randomBytes(16).toString("hex"); // 32-char token
-}
+
 
 const cases = new Map();
 
@@ -28,35 +26,34 @@ export function createCase(payload) {
     record.shareToken = makeShareToken();
     record.shareUrl = `/share/${record.shareToken}`;
 
-    CASES.push(record);
+    cases.set(record.id, record);
     return record;
 }
 
 export function getCaseByShareToken(token) {
-    return CASES.find((c) => c.shareToken === token) || null;
-}
+    return Array.from(cases.values()).find((c) => c.shareToken === token) || null;
 
 
-export function getCase(id) {
-    return cases.get(id);
-}
+    export function getCase(id) {
+        return cases.get(id);
+    }
 
-export function listCases() {
-    return Array.from(cases.values());
-}
+    export function listCases() {
+        return Array.from(cases.values());
+    }
 
-export function attachEvidence(id, files = []) {
-    const record = cases.get(id);
-    if (!record) return null;
+    export function attachEvidence(id, files = []) {
+        const record = cases.get(id);
+        if (!record) return null;
 
-    record.evidence = record.evidence || [];
-    record.evidence.push(
-        ...files.map((f) => ({
-            name: f.originalname,
-            path: f.path,
-            size: f.size,
-        }))
-    );
+        record.evidence = record.evidence || [];
+        record.evidence.push(
+            ...files.map((f) => ({
+                name: f.originalname,
+                path: f.path,
+                size: f.size,
+            }))
+        );
 
-    return record;
-}
+        return record;
+    }
