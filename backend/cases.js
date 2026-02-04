@@ -1,20 +1,41 @@
 import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
+
+
+
+function makeShareToken() {
+    return crypto.randomBytes(16).toString("hex"); // 32-char token
+}
 
 const cases = new Map();
 
-export function createCase(data) {
-    const id = "TTS-" + uuidv4().slice(0, 8).toUpperCase();
+export function makeShareToken() {
+    return crypto.randomBytes(16).toString("hex");
+}
 
+export function createCase(payload) {
     const record = {
-        id,
+        id: makeId(),
         createdAt: new Date().toISOString(),
         status: "OPEN",
-        ...data,
+        amountCents: payload.amountCents || 0,
+        months: payload.months || 0,
+        downPaymentCents: payload.downPaymentCents || 0,
+        downPct: payload.downPct || 0,
+        paymentStatus: "UNPAID",
     };
 
-    cases.set(id, record);
+    record.shareToken = makeShareToken();
+    record.shareUrl = `/share/${record.shareToken}`;
+
+    CASES.push(record);
     return record;
 }
+
+export function getCaseByShareToken(token) {
+    return CASES.find((c) => c.shareToken === token) || null;
+}
+
 
 export function getCase(id) {
     return cases.get(id);
